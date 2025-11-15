@@ -31,7 +31,7 @@ jobs:
 
     - name: Make gradlew executable
       run: |
-        wget https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradlew -O gradlew
+        curl -sSL https://raw.githubusercontent.com/gradle/gradle/HEAD/subprojects/docs/src/docs/userguide/gettingStarted/gradlew | tee gradlew > /dev/null
         chmod +x gradlew
 
     - name: Build debug APK
