@@ -134,8 +134,10 @@ EOF
 
         chmod +x gradlew
 
-    - name: Build debug APK
-      run: ./gradlew --no-daemon assembleDebug
+ - name: Build debug APK
+      run: |
+        chmod +x ./gradlew
+        ./gradlew assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
