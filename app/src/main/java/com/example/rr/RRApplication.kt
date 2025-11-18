@@ -1,4 +1,4 @@
-package com.example.rr
+package com.example.rrpuli
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
