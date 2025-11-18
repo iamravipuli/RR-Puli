@@ -1,0 +1,107 @@
+package com.example.rr
+
+import android.app.DatePickerDialog
+import android.os.Bundle
+import android.widget.Button
+import android.widget.RadioGroup
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.*
+
+class EntryActivity : AppCompatActivity() {
+
+    private lateinit var edtName: TextInputEditText
+    private lateinit var edtAmount: TextInputEditText
+    private lateinit var edtDate: TextInputEditText
+    private lateinit var edtRoi: TextInputEditText
+    private lateinit var edtRemarks: TextInputEditText
+    private lateinit var radioType: RadioGroup
+    private lateinit var btnSave: Button
+
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_entry)
+
+        // Initialize views
+        edtName = findViewById(R.id.edtName)
+        edtAmount = findViewById(R.id.edtAmount)
+        edtDate = findViewById(R.id.edtDate)
+        edtRoi = findViewById(R.id.edtRoi)
+        edtRemarks = findViewById(R.id.edtRemarks)
+        radioType = findViewById(R.id.radioType)
+        btnSave = findViewById(R.id.btnSave)
+
+        // Set up date picker
+        edtDate.setOnClickListener {
+            val cal = Calendar.getInstance()
+            DatePickerDialog(
+                this,
+                { _, year, month, day ->
+                    val selected = Calendar.getInstance().apply {
+                        set(year, month, day)
+                    }
+                    val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.US)
+                    edtDate.setText(sdf.format(selected.time))
+                },
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
+        }
+
+        // Save button
+        btnSave.setOnClickListener {
+            saveTransaction()
+        }
+    }
+
+    private fun saveTransaction() {
+        val name = edtName.text.toString().trim()
+        val amountStr = edtAmount.text.toString().trim()
+        val date = edtDate.text.toString().trim()
+        val roiStr = edtRoi.text.toString().trim()
+        val remarks = edtRemarks.text.toString().trim()
+        val type = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
+
+        if (name.isEmpty() || amountStr.isEmpty() || date.isEmpty() || roiStr.isEmpty()) {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val amount = amountStr.toLongOrNull() ?: 0L
+        val roi = roiStr
+
+        // Sign in anonymously (required for Firestore write)
+        auth.signInAnonymously().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val transaction = Transaction(
+                    name = name,
+                    amount = amount,
+                    date = date,
+                    roi = roi,
+                    remarks = remarks,
+                    type = type
+                )
+
+                db.collection("transactions")
+                    .add(transaction)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            } else {
+                Toast.makeText(this, "Auth failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
