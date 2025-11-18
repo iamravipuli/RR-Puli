@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.rr'
+    namespace 'com.example.rrpuli'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.rr"
+        applicationId "com.example.rrpuli"
         minSdk 21
         targetSdk 34
         versionCode 1
