@@ -14,6 +14,8 @@ class CalculateActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCalculateBinding
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+
+    // Store selected dates to restore in picker
     private var selectedDate1: Date? = null
     private var selectedDate2: Date? = null
 
@@ -24,36 +26,42 @@ class CalculateActivity : AppCompatActivity() {
 
         setupInputFilters()
         setupDatePickers()
-        setupClearDateListeners()
+        setupClearDateListeners() // Optional: sync clear with stored dates
 
         binding.btnCalculate.setOnClickListener {
             validateAndCalculate()
         }
     }
 
-     private fun setupInputFilters() {
+    private fun setupInputFilters() {
+        // Amount: max 7 digits
         binding.edtAmount.filters = arrayOf(android.text.InputFilter.LengthFilter(7))
 
+        // Rate: custom decimal filter (max 2 before, 2 after decimal)
         binding.edtRate.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val input = s.toString()
+                val input = s?.toString() ?: ""
                 if (input.isEmpty() || input == ".") return
 
                 val parts = input.split(".")
-                val before = parts[0]
+                val before = if (parts.isNotEmpty()) parts[0] else ""
                 val after = if (parts.size > 1) parts[1] else ""
 
                 var corrected = input
 
+                // Enforce max 2 digits before decimal
                 if (before.length > 2) {
                     corrected = before.take(2)
                     if (after.isNotEmpty()) corrected += "." + after.take(2)
-                } else if (after.length > 2) {
+                }
+                // Enforce max 2 digits after decimal
+                else if (after.length > 2) {
                     corrected = before + "." + after.take(2)
                 }
 
+                // Prevent leading zeros (e.g., "00.5" -> "0.5")
                 if (before.length > 1 && before.startsWith("0")) {
                     corrected = before.drop(1)
                     if (after.isNotEmpty()) corrected += "." + after.take(2)
@@ -130,20 +138,14 @@ class CalculateActivity : AppCompatActivity() {
 
         hideKeyboard()
 
-        val amount = amountStr.toDoubleOrNull() ?: run {
-            binding.txtResult.text = "⚠️ Invalid amount"
-            return
-        }
-        val roi = rateStr.toDoubleOrNull() ?: run {
-            binding.txtResult.text = "⚠️ Invalid rate"
-            return
-        }
+        val amount = amountStr.toDoubleOrNull()
+        val roi = rateStr.toDoubleOrNull()
 
-        if (amount <= 0) {
+        if (amount == null || amount <= 0) {
             binding.txtResult.text = "⚠️ Amount must be > 0"
             return
         }
-        if (roi < 0) {
+        if (roi == null || roi < 0) {
             binding.txtResult.text = "⚠️ Rate cannot be negative"
             return
         }
@@ -161,20 +163,22 @@ class CalculateActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ Inclusive: +1 day
-        val daysBetween = (date2.time - date1.time) / (24 * 60 * 60 * 1000) + 1
+        // ✅ INCLUSIVE DURATION: Add 1 day so both start and end are counted
+        val daysBetween = ((date2.time - date1.time) / (24 * 60 * 60 * 1000)).toInt() + 1
+
         val interest = (amount * roi * daysBetween) / (100 * 30)
         val total = amount + interest
 
-        // Format as whole numbers with Indian commas (e.g., 1,50,000)
+        // Format with Indian comma style
         binding.txtPrincipal.text = "₹${formatIndianNumber(amount)}"
         binding.txtInterest.text = "₹${formatIndianNumber(interest)}"
         binding.txtTotal.text = "₹${formatIndianNumber(total)}"
 
+        // Duration: approximate
         val years = daysBetween / 365
-        val rem = (daysBetween % 365).toInt()
-        val months = rem / 30
-        val days = rem % 30
+        val remainingAfterYears = daysBetween % 365
+        val months = remainingAfterYears / 30
+        val days = remainingAfterYears % 30
         binding.txtDuration.text = "${years}y ${months}m ${days}d"
 
         binding.txtResult.text = "✓ Calculated for $daysBetween day(s)"
@@ -205,24 +209,16 @@ class CalculateActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.btnCalculate.windowToken, 0)
     }
 
     private fun formatIndianNumber(value: Double): String {
-        val whole = Math.round(value).toLong()
         return try {
             val formatter = android.icu.text.DecimalFormat("#,##,##0")
-            formatter.format(whole)
+            formatter.format(value.toLong())
         } catch (e: Throwable) {
-            String.format("%,d", whole)
+            String.format("%.0f", value)
         }
     }
 }
-
-
-
-
-  
-
-    
