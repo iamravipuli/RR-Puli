@@ -34,10 +34,8 @@ class CalculateActivity : AppCompatActivity() {
     }
 
     private fun setupInputFilters() {
-        // Amount: max 7 digits
         binding.edtAmount.filters = arrayOf(android.text.InputFilter.LengthFilter(7))
 
-        // Rate: custom decimal filter (max 2 before, 2 after decimal)
         binding.edtRate.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -51,17 +49,13 @@ class CalculateActivity : AppCompatActivity() {
 
                 var corrected = input
 
-                // Enforce max 2 digits before decimal
                 if (before.length > 2) {
                     corrected = before.take(2)
                     if (after.isNotEmpty()) corrected += "." + after.take(2)
-                }
-                // Enforce max 2 digits after decimal
-                else if (after.length > 2) {
+                } else if (after.length > 2) {
                     corrected = before + "." + after.take(2)
                 }
 
-                // Prevent leading zeros (e.g., "00.5" -> "0.5")
                 if (before.length > 1 && before.startsWith("0")) {
                     corrected = before.drop(1)
                     if (after.isNotEmpty()) corrected += "." + after.take(2)
@@ -163,22 +157,20 @@ class CalculateActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ INCLUSIVE DURATION: Add 1 day so both start and end are counted
+        // ✅ Inclusive: +1 day
         val daysBetween = ((date2.time - date1.time) / (24 * 60 * 60 * 1000)).toInt() + 1
-
         val interest = (amount * roi * daysBetween) / (100 * 30)
         val total = amount + interest
 
-        // Format with Indian comma style
+        // Format with Indian commas
         binding.txtPrincipal.text = "₹${formatIndianNumber(amount)}"
         binding.txtInterest.text = "₹${formatIndianNumber(interest)}"
         binding.txtTotal.text = "₹${formatIndianNumber(total)}"
 
-        // Duration: approximate
         val years = daysBetween / 365
-        val remainingAfterYears = daysBetween % 365
-        val months = remainingAfterYears / 30
-        val days = remainingAfterYears % 30
+        val rem = (daysBetween % 365).toInt()
+        val months = rem / 30
+        val days = rem % 30
         binding.txtDuration.text = "${years}y ${months}m ${days}d"
 
         binding.txtResult.text = "✓ Calculated for $daysBetween day(s)"
@@ -218,7 +210,7 @@ class CalculateActivity : AppCompatActivity() {
             val formatter = android.icu.text.DecimalFormat("#,##,##0")
             formatter.format(value.toLong())
         } catch (e: Throwable) {
-            String.format("%.0f", value)
+            value.toLong().toString()
         }
     }
 }
