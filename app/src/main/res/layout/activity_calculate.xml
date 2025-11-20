@@ -50,8 +50,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1.2"
                     android:inputType="number"
-                    android:digits="0123456789"
-                    android:maxLength="7"
                     android:background="@drawable/rounded_edittext"
                     android:padding="12dp"
                     android:textSize="16sp" />
@@ -78,7 +76,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1.2"
                     android:inputType="numberDecimal"
-                    android:digits="0123456789."
                     android:background="@drawable/rounded_edittext"
                     android:padding="12dp"
                     android:textSize="16sp" />
