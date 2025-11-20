@@ -6,7 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import com.example.rr.databinding.ActivityCalculateBinding
+import com.example.rrpuli.databinding.ActivityCalculateBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,10 +15,6 @@ class CalculateActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCalculateBinding
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
 
-    // Store selected dates to restore in picker
-    private var selectedDate1: Date? = null
-    private var selectedDate2: Date? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCalculateBinding.inflate(layoutInflater)
@@ -26,7 +22,6 @@ class CalculateActivity : AppCompatActivity() {
 
         setupInputFilters()
         setupDatePickers()
-        setupClearDateListeners() // Optional: sync clear with stored dates
 
         binding.btnCalculate.setOnClickListener {
             validateAndCalculate()
@@ -34,8 +29,10 @@ class CalculateActivity : AppCompatActivity() {
     }
 
     private fun setupInputFilters() {
+        // Amount: max 7 digits
         binding.edtAmount.filters = arrayOf(android.text.InputFilter.LengthFilter(7))
 
+        // Rate: custom decimal filter (max 2 before, 2 after decimal)
         binding.edtRate.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -49,13 +46,17 @@ class CalculateActivity : AppCompatActivity() {
 
                 var corrected = input
 
+                // Enforce max 2 digits before decimal
                 if (before.length > 2) {
                     corrected = before.take(2)
                     if (after.isNotEmpty()) corrected += "." + after.take(2)
-                } else if (after.length > 2) {
+                }
+                // Enforce max 2 digits after decimal
+                else if (after.length > 2) {
                     corrected = before + "." + after.take(2)
                 }
 
+                // Prevent leading zeros (e.g., "00.5" -> "0.5")
                 if (before.length > 1 && before.startsWith("0")) {
                     corrected = before.drop(1)
                     if (after.isNotEmpty()) corrected += "." + after.take(2)
@@ -73,38 +74,44 @@ class CalculateActivity : AppCompatActivity() {
 
     private fun setupDatePickers() {
         binding.edtDate1.setOnClickListener {
-            val initialDate = selectedDate1 ?: Date()
-            showDatePicker(initialDate) { date ->
-                selectedDate1 = date
-                binding.edtDate1.setText(dateFormat.format(date))
-            }
+            val cal = Calendar.getInstance()
+            DatePickerDialog(
+                this,
+                { _, year, month, day ->
+                    val selected = Calendar.getInstance().apply {
+                        set(year, month, day)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    binding.edtDate1.setText(dateFormat.format(selected.time))
+                },
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
 
         binding.edtDate2.setOnClickListener {
-            val initialDate = selectedDate2 ?: Date()
-            showDatePicker(initialDate) { date ->
-                selectedDate2 = date
-                binding.edtDate2.setText(dateFormat.format(date))
-            }
+            val cal = Calendar.getInstance()
+            DatePickerDialog(
+                this,
+                { _, year, month, day ->
+                    val selected = Calendar.getInstance().apply {
+                        set(year, month, day)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
+                    binding.edtDate2.setText(dateFormat.format(selected.time))
+                },
+                cal.get(Calendar.YEAR),
+                cal.get(Calendar.MONTH),
+                cal.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
-    }
-
-    private fun setupClearDateListeners() {
-        binding.edtDate1.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (s.isNullOrEmpty()) selectedDate1 = null
-            }
-        })
-
-        binding.edtDate2.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                if (s.isNullOrEmpty()) selectedDate2 = null
-            }
-        })
     }
 
     private fun validateAndCalculate() {
@@ -157,16 +164,18 @@ class CalculateActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ Inclusive: +1 day
+        // ✅ INCLUSIVE DURATION: Add 1 day so both start and end are counted
         val daysBetween = ((date2.time - date1.time) / (24 * 60 * 60 * 1000)).toInt() + 1
+
         val interest = (amount * roi * daysBetween) / (100 * 30)
         val total = amount + interest
 
-        // Format with Indian commas
+        // Format with Indian comma style
         binding.txtPrincipal.text = "₹${formatIndianNumber(amount)}"
         binding.txtInterest.text = "₹${formatIndianNumber(interest)}"
         binding.txtTotal.text = "₹${formatIndianNumber(total)}"
 
+        // Duration: approximate
         val years = daysBetween / 365
         val rem = (daysBetween % 365).toInt()
         val months = rem / 30
@@ -174,30 +183,6 @@ class CalculateActivity : AppCompatActivity() {
         binding.txtDuration.text = "${years}y ${months}m ${days}d"
 
         binding.txtResult.text = "✓ Calculated for $daysBetween day(s)"
-    }
-
-    private fun showDatePicker(initialDate: Date, onSelected: (Date) -> Unit) {
-        val cal = Calendar.getInstance()
-        cal.time = initialDate
-
-        DatePickerDialog(
-            this,
-            { _, year, month, day ->
-                val selected = Calendar.getInstance().apply {
-                    set(Calendar.YEAR, year)
-                    set(Calendar.MONTH, month)
-                    set(Calendar.DAY_OF_MONTH, day)
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }
-                onSelected(selected.time)
-            },
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
-        ).show()
     }
 
     private fun hideKeyboard() {
@@ -210,7 +195,7 @@ class CalculateActivity : AppCompatActivity() {
             val formatter = android.icu.text.DecimalFormat("#,##,##0")
             formatter.format(value.toLong())
         } catch (e: Throwable) {
-            value.toLong().toString()
+            String.format("%.0f", value)
         }
     }
 }
