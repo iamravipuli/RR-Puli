@@ -23,12 +23,12 @@ class HomeActivity : AppCompatActivity() {
 
         // Interest Calculator (PULI-style)
         findViewById<Button>(R.id.btnCalculate).setOnClickListener {
-           // startActivity(Intent(this, CalculateActivity::class.java))
+            startActivity(Intent(this, CalculateActivity::class.java))
         }
 
         // New Transaction (Firestore entry)
         findViewById<Button>(R.id.btnNewTransaction).setOnClickListener {
-           // startActivity(Intent(this, EntryActivity::class.java))
+            startActivity(Intent(this, EntryActivity::class.java))
         }
     }
 }
