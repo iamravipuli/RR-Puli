@@ -9,7 +9,7 @@
         android:id="@+id/txtTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Credit List"  <!-- Will be updated in code -->
+        android:text="Credit List"   
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#1A73E8"
