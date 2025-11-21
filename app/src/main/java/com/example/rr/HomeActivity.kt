@@ -12,23 +12,23 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         // Credit Reports → passes "credit" type
-        findViewById<Button>(R.id.btnCredit).setOnClickListener {
+        findViewById<View>(R.id.tileCredit).setOnClickListener {
             startActivity(Intent(this, ReportsActivity::class.java).putExtra("type", "credit"))
         }
 
         // Debit Reports → passes "debit" type
-        findViewById<Button>(R.id.btnDebit).setOnClickListener {
+        findViewById<View>(R.id.tileDebit).setOnClickListener {
             startActivity(Intent(this, ReportsActivity::class.java).putExtra("type", "debit"))
         }
 
         // Interest Calculator (PULI-style)
-        findViewById<Button>(R.id.btnCalculate).setOnClickListener {
+        findViewById<View>(R.id.tileCalculate).setOnClickListener {
             startActivity(Intent(this, CalculateActivity::class.java))
         }
 
-        // New Transaction (Firestore entry)
-        findViewById<Button>(R.id.btnNewTransaction).setOnClickListener {
+            
+            findViewById<View>(R.id.tileNewTransaction).setOnClickListener {
             startActivity(Intent(this, EntryActivity::class.java))
-        }
+            }
     }
 }
