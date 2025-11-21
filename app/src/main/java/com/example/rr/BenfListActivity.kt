@@ -2,6 +2,7 @@ package com.example.rrpuli
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,8 +25,14 @@ class BenfListActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        // Get transaction type from intent
         val transactionType = intent.getStringExtra("type") ?: "credit"
 
+        // ✅ Update title based on type
+        val title = findViewById<TextView>(R.id.txtTitle)
+        title.text = if (transactionType == "debit") "Debit List" else "Credit List"
+
+        // Fetch data from Firestore
         fetchTransactions(transactionType) { list ->
             adapter = BenfAdapter(this, list)
             recyclerView.adapter = adapter
