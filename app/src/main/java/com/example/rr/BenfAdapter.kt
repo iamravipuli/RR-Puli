@@ -2,15 +2,11 @@ package com.example.rrpuli
 
 import android.content.Context
 import android.content.Intent
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.text.SimpleDateFormat
-import java.util.*
 
 class BenfAdapter(
     private val context: Context,
@@ -35,39 +31,20 @@ class BenfAdapter(
         // Line 1: Name (Blue)
         holder.txtName.text = item.name
 
-        // Line 2: Amount (Green) | Date (Black)
+        // Line 2: Amount (Green) | Date (Black) - Plain text
         val formattedAmount = try {
             val formatter = android.icu.text.DecimalFormat("#,##,##0")
             "₹${formatter.format(item.amount)}"
         } catch (e: Throwable) {
             "₹${item.amount}"
         }
-        val amountDateText = "$formattedAmount | ${item.date}"
-        val spannable = SpannableString(amountDateText)
+        holder.txtAmountDate.text = "$formattedAmount | ${item.date}"
 
-        // Color amount (green)
-        spannable.setSpan(
-            ForegroundColorSpan(0xFF34A853.toInt()),
-            0,
-            formattedAmount.length,
-            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-
-        // Color date (black)
-        spannable.setSpan(
-            ForegroundColorSpan(0xFF202124.toInt()),
-            formattedAmount.length + 3, // Skip " | "
-            amountDateText.length,
-            android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-
-        holder.txtAmountDate.text = spannable
-
-        // Line 3: Interest (Red, calculated from date to today)
+        // Line 3: Interest (Red) with Indian comma formatting
         val interestText = try {
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+            val sdf = java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.US)
             val startDate = sdf.parse(item.date) ?: throw Exception("Invalid date")
-            val today = Date()
+            val today = java.util.Date()
 
             if (today.before(startDate)) {
                 "Interest: ₹0 (future date)"
@@ -76,15 +53,20 @@ class BenfAdapter(
                 val days = (diffMillis / (24 * 60 * 60 * 1000)).toInt() + 1 // inclusive
 
                 val roi = item.iRate.toDoubleOrNull() ?: 0.0
-                val interest = (item.amount.toDouble() * roi * days) / (100 * 30)
-                val interestRounded = Math.round(interest).toLong()
-                val formattedInterest = try {
-                    val formatter = android.icu.text.DecimalFormat("#,##,##0")
-                    formatter.format(interestRounded)
-                } catch (e: Throwable) {
-                    interestRounded.toString()
+                val interest = (item.amount.toDouble() * roi * days) / (100.0 * 30.0)
+
+                if (interest.isFinite()) {
+                    val interestRounded = Math.round(interest).toLong()
+                    val formattedInterest = try {
+                        val formatter = android.icu.text.DecimalFormat("#,##,##0")
+                        formatter.format(interestRounded)
+                    } catch (e: Throwable) {
+                        interestRounded.toString()
+                    }
+                    "Interest: ₹$formattedInterest"
+                } else {
+                    "Interest: ₹0"
                 }
-                "Interest: ₹$formattedInterest"
             }
         } catch (e: Exception) {
             "Interest: Error"
@@ -92,6 +74,7 @@ class BenfAdapter(
 
         holder.txtInterest.text = interestText
 
+        // Navigate to detail screen
         holder.itemView.setOnClickListener {
             val intent = Intent(context, BenfDetailActivity::class.java).apply {
                 putExtra("item", item)
