@@ -23,6 +23,7 @@
 <activity android:name=".CalculateActivity" />
 <activity android:name=".EntryActivity" />
         <activity android:name=".BenfDetailActivity" />
+         <activity android:name=".BenfListActivity" />
     </application>
 
 </manifest>
