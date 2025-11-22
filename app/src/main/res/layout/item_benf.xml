@@ -3,10 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFFFFF">
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp">
 
-    <!-- Name: Blue -->
+    <!-- Name: Blue (PULI style) -->
     <TextView
         android:id="@+id/txtName"
         android:layout_width="match_parent"
@@ -15,7 +17,7 @@
         android:textStyle="bold"
         android:textColor="#1A73E8" />
 
-    <!-- Amount | Date: Green | Black -->
+    <!-- Amount | Date: Gray -->
     <TextView
         android:id="@+id/txtAmountDate"
         android:layout_width="match_parent"
@@ -32,12 +34,5 @@
         android:textSize="14sp"
         android:textColor="#EA4335"
         android:layout_marginTop="6dp" />
-
-    <!-- Divider -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#E0E0E0"
-        android:layout_marginTop="10dp" />
 
 </LinearLayout>
