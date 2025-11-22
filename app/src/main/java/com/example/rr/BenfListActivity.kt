@@ -39,39 +39,48 @@ class BenfListActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
-        Thread {
-            try {
-                db.collection("transactions")
-                    .whereEqualTo("type", type)
-                    .get()
-                    .addOnSuccessListener { result ->
-                        val list = mutableListOf<BenfDetails>()
-                        for (document in result) {
-                            val item = BenfDetails(
-                                id = document.id,
-                                name = document.getString("name") ?: "",
-                                amount = document.getLong("amount") ?: 0,
-                                date = document.getString("date") ?: "",
-                                iRate = document.getString("roi") ?: "0.00",
-                                remarks = document.getString("remarks") ?: ""
-                            )
-                            list.add(item)
-                        }
-                        runOnUiThread {
-                            onSuccess(list)
-                        }
+  private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
+    Thread {
+        try {
+            db.collection("transactions")
+                .whereEqualTo("type", type.lowercase())  // Force lowercase match
+                .get()
+                .addOnSuccessListener { result ->
+                    println("Firestore: Found ${result.size()} documents for type: $type")  // ✅ Debug log
+                    
+                    val list = mutableListOf<BenfDetails>()
+                    for (document in result) {
+                        println("Firestore: Processing doc ID: ${document.id}")  // ✅ Debug log
+                        
+                        val item = BenfDetails(
+                            id = document.id,
+                            name = document.getString("name") ?: "",
+                            amount = document.getLong("amount") ?: 0,
+                            date = document.getString("date") ?: "",
+                            iRate = document.getString("roi") ?: "0.00",
+                            remarks = document.getString("remarks") ?: ""
+                        )
+                        list.add(item)
+                        println("Firestore: Added item: ${item.name}")  // ✅ Debug log
                     }
-                    .addOnFailureListener { exception ->
-                        runOnUiThread {
-                            Toast.makeText(this, "Load failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                    
+                    runOnUiThread {
+                        if (list.isEmpty()) {
+                            Toast.makeText(this, "No $type records found", Toast.LENGTH_LONG).show()
                         }
+                        onSuccess(list)
                     }
-            } catch (e: Exception) {
-                runOnUiThread {
-                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
+                .addOnFailureListener { exception ->
+                    runOnUiThread {
+                        Toast.makeText(this, "Load failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+        } catch (e: Exception) {
+            runOnUiThread {
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
-        }.start()
-    }
+        }
+    }.start()
+}
 }
