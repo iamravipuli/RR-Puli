@@ -39,19 +39,15 @@ class BenfListActivity : AppCompatActivity() {
         }
     }
 
-  private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
+ private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
     Thread {
         try {
             db.collection("transactions")
-                .whereEqualTo("type", type.lowercase())  // Force lowercase match
+                .whereEqualTo("type", type.lowercase())
                 .get()
                 .addOnSuccessListener { result ->
-                    println("Firestore: Found ${result.size()} documents for type: $type")  // ✅ Debug log
-                    
                     val list = mutableListOf<BenfDetails>()
                     for (document in result) {
-                        println("Firestore: Processing doc ID: ${document.id}")  // ✅ Debug log
-                        
                         val item = BenfDetails(
                             id = document.id,
                             name = document.getString("name") ?: "",
@@ -61,13 +57,18 @@ class BenfListActivity : AppCompatActivity() {
                             remarks = document.getString("remarks") ?: ""
                         )
                         list.add(item)
-                        println("Firestore: Added item: ${item.name}")  // ✅ Debug log
                     }
                     
+                    // ✅ Update UI with new data
                     runOnUiThread {
                         if (list.isEmpty()) {
                             Toast.makeText(this, "No $type records found", Toast.LENGTH_LONG).show()
                         }
+                        
+                        // ✅ Create new adapter with fetched data
+                        val newAdapter = BenfAdapter(this, list)
+                        recyclerView.adapter = newAdapter  // ✅ Set adapter here
+                        
                         onSuccess(list)
                     }
                 }
