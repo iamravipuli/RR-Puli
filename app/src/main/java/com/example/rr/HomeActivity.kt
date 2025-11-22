@@ -13,12 +13,12 @@ class HomeActivity : AppCompatActivity() {
 
         // Credit Reports → passes "credit" type
         findViewById<View>(R.id.tileCredit).setOnClickListener {
-            startActivity(Intent(this, ReportsActivity::class.java).putExtra("type", "credit"))
+            startActivity(Intent(this, BenfListActivity::class.java).putExtra("type", "credit"))
         }
 
         // Debit Reports → passes "debit" type
         findViewById<View>(R.id.tileDebit).setOnClickListener {
-            startActivity(Intent(this, ReportsActivity::class.java).putExtra("type", "debit"))
+            startActivity(Intent(this, BenfListActivity::class.java).putExtra("type", "debit"))
         }
 
         // Interest Calculator (PULI-style)
