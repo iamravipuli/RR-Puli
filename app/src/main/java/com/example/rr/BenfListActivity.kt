@@ -25,63 +25,59 @@ class BenfListActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Get transaction type from intent
         val transactionType = intent.getStringExtra("type") ?: "credit"
-
-        // ✅ Update title based on type
         val title = findViewById<TextView>(R.id.txtTitle)
         title.text = if (transactionType == "debit") "Debit List" else "Credit List"
 
-        // Fetch data from Firestore
+        // ✅ Fetch and set adapter
         fetchTransactions(transactionType) { list ->
+            // ✅ Debug: Print size
+            println("DEBUG: Loaded ${list.size} items for type: $transactionType")
+            
+            if (list.isEmpty()) {
+                Toast.makeText(this, "No $transactionType records found", Toast.LENGTH_LONG).show()
+            }
+            
+            // ✅ Create new adapter and set it
             adapter = BenfAdapter(this, list)
-            recyclerView.adapter = adapter
+            recyclerView.adapter = adapter  // ✅ Set adapter AFTER creation
         }
     }
 
- private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
-    Thread {
-        try {
-            db.collection("transactions")
-                .whereEqualTo("type", type.lowercase())
-                .get()
-                .addOnSuccessListener { result ->
-                    val list = mutableListOf<BenfDetails>()
-                    for (document in result) {
-                        val item = BenfDetails(
-                            id = document.id,
-                            name = document.getString("name") ?: "",
-                            amount = document.getLong("amount") ?: 0,
-                            date = document.getString("date") ?: "",
-                            iRate = document.getString("roi") ?: "0.00",
-                            remarks = document.getString("remarks") ?: ""
-                        )
-                        list.add(item)
-                    }
-                    
-                    // ✅ Update UI with new data
-                    runOnUiThread {
-                        if (list.isEmpty()) {
-                            Toast.makeText(this, "No $type records found", Toast.LENGTH_LONG).show()
+    private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
+        Thread {
+            try {
+                db.collection("transactions")
+                    .whereEqualTo("type", type.lowercase())
+                    .get()
+                    .addOnSuccessListener { result ->
+                        val list = mutableListOf<BenfDetails>()
+                        for (document in result) {
+                            val item = BenfDetails(
+                                id = document.id,
+                                name = document.getString("name") ?: "",
+                                amount = document.getLong("amount") ?: 0,
+                                date = document.getString("date") ?: "",
+                                iRate = document.getString("roi") ?: "0.00",
+                                remarks = document.getString("remarks") ?: ""
+                            )
+                            list.add(item)
                         }
                         
-                        // ✅ Create new adapter with fetched data
-                        val newAdapter = BenfAdapter(this, list)
-                        recyclerView.adapter = newAdapter  // ✅ Set adapter here
-                        
-                        onSuccess(list)
+                        runOnUiThread {
+                            onSuccess(list)
+                        }
                     }
-                }
-                .addOnFailureListener { exception ->
-                    runOnUiThread {
-                        Toast.makeText(this, "Load failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                    .addOnFailureListener { exception ->
+                        runOnUiThread {
+                            Toast.makeText(this, "Load failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                        }
                     }
+            } catch (e: Exception) {
+                runOnUiThread {
+                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
-        } catch (e: Exception) {
-            runOnUiThread {
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
-        }
-    }.start()
-}
+        }.start()
+    }
 }
