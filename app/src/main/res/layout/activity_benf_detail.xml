@@ -2,14 +2,15 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
+        <!-- Beneficiary Name (Blue, centered) -->
         <TextView
             android:id="@+id/txtName"
             android:layout_width="match_parent"
@@ -17,38 +18,336 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#1A73E8"
-            android:layout_marginBottom="16dp" />
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
 
+        <!-- 💙 CREDIT DETAILS (No background) -->
         <TextView
-            android:id="@+id/txtAmount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="CREDIT DETAILS"
             android:textSize="16sp"
-            android:textColor="#202124"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold"
+            android:textColor="#1A73E8"
+            android:layout_marginBottom="12dp" />
 
-        <TextView
-            android:id="@+id/txtDate"
+        <!-- Principal Amount -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="#5F6368"
-            android:layout_marginBottom="8dp" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Principal Amount"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="#34A853"
+                android:gravity="start" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/txtIRate"
+        <!-- Date -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Date"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- Interest Rate -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Interest Rate"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtIRate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="#EA4335"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- 💚 INTEREST & TOTAL (No background) -->
+        <TextView
+            android:id="@+id/txtInterestHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="INTEREST TO DATE"
             android:textSize="16sp"
+            android:textStyle="bold"
             android:textColor="#34A853"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
+
+        <!-- Accrued Interest -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Accrued Interest"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtCalculatedInterest"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="#EA4335"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- Total Amount -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total Amount"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtTotalAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1A73E8"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- Duration -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="20dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Duration"
+                android:textSize="16sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtDuration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textColor="#5F6368"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- ⚪ REMARKS (No background) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="REMARKS"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#5F6368"
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/txtRemarks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="#5F6368"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- 💡 PROJECTED INTEREST SECTION (No background) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PROJECTED INTEREST"
             android:textSize="16sp"
-            android:textColor="#5F6368" />
+            android:textStyle="bold"
+            android:textColor="#FF9800"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Select Future Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Select Future Date"
+                android:textSize="15sp"
+                android:textColor="#202124" />
+
+            <EditText
+                android:id="@+id/edtProjectedDate"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1.2"
+                android:hint="dd/mm/yyyy"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:background="@drawable/rounded_edittext"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnCalculateProjected"
+            android:layout_width="200dp"
+            android:layout_height="48dp"
+            android:text="Calculate Projected"
+            android:textSize="14sp"
+            android:backgroundTint="#FF9800"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Results -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Projected Interest"
+                android:textSize="15sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtProjectedInterest"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="15sp"
+                android:textColor="#EA4335"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total Amount"
+                android:textSize="15sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtTotalProjected"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#1A73E8"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Duration"
+                android:textSize="15sp"
+                android:textColor="#202124"
+                android:gravity="end"
+                android:paddingEnd="12dp" />
+            <TextView
+                android:id="@+id/txtProjectedDuration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="15sp"
+                android:textColor="#5F6368"
+                android:gravity="start" />
+        </LinearLayout>
+
+        <!-- Clarity note -->
+        <TextView
+            android:id="@+id/txtProjectionNote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#757575"
+            android:gravity="center"
+            android:layout_marginTop="8dp" />
 
     </LinearLayout>
 </ScrollView>
