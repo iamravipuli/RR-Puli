@@ -28,6 +28,7 @@ class PinActivity : AppCompatActivity() {
             .addOnCompleteListener { signInTask ->
                 if (signInTask.isSuccessful) {
                     // Now fetch the PIN from Firestore
+                      Toast.makeText(this, "Logged in.. Fetching data..", Toast.LENGTH_LONG).show()
                     fetchPinFromFirestore()
                 } else {
                     runOnUiThread {
@@ -56,7 +57,8 @@ class PinActivity : AppCompatActivity() {
     }
 
     private fun fetchPinFromFirestore() {
-        db.collection("app_config")
+        // ✅ Updated path: app_configs (collection) / 8pIPAtsGEjNRc3w3XS61 (document)
+        db.collection("app_config")  
             .document("8pIPAtsGEjNRc3w3XS61")
             .get()
             .addOnSuccessListener { document ->
