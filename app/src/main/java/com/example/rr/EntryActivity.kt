@@ -10,6 +10,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
+import androidx.appcompat.app.AlertDialog
 import java.util.*
 
 class EntryActivity : AppCompatActivity() {
