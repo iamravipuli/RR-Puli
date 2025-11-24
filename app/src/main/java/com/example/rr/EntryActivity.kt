@@ -89,16 +89,34 @@ class EntryActivity : AppCompatActivity() {
                     remarks = remarks,
                     type = type
                 )
-
-                db.collection("transactions")
-                    .add(transaction)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
+// After your Firestore save
+db.collection("transactions")
+    .add(transaction)
+    .addOnSuccessListener {
+        // ✅ Show popup instead of Toast
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Success!")
+            .setMessage("Transaction saved successfully.")
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+                finish()  // Go back to previous screen
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+    }
+    .addOnFailureListener { exception ->
+        Toast.makeText(this, "Save failed: ${exception.message}", Toast.LENGTH_LONG).show()
+    }
+             //   db.collection("transactions")
+             //       .add(transaction)
+              //      .addOnSuccessListener {
+             //          Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
+              //          finish()
+             //       }
+             //       .addOnFailureListener { e ->
+             //           Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+              //      }
             } else {
                 Toast.makeText(this, "Auth failed", Toast.LENGTH_SHORT).show()
             }
