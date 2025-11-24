@@ -28,7 +28,7 @@ class PinActivity : AppCompatActivity() {
             .addOnCompleteListener { signInTask ->
                 if (signInTask.isSuccessful) {
                     // Now fetch the PIN from Firestore
-                      Toast.makeText(this, "Logged in.. Fetching data..", Toast.LENGTH_LONG).show()
+                     // Toast.makeText(this, "Logged in.. Fetching data..", Toast.LENGTH_LONG).show()
                     fetchPinFromFirestore()
                 } else {
                     runOnUiThread {
