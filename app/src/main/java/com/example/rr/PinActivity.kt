@@ -23,7 +23,7 @@ class PinActivity : AppCompatActivity() {
 
         edtPin = findViewById(R.id.edtPin)
 
-        
+        // ✅ Sign in anonymously first
         auth.signInAnonymously()
             .addOnCompleteListener { signInTask ->
                 if (signInTask.isSuccessful) {
@@ -36,6 +36,7 @@ class PinActivity : AppCompatActivity() {
                 }
             }
 
+        // PIN input listener
         edtPin.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -56,7 +57,7 @@ class PinActivity : AppCompatActivity() {
 
     private fun fetchPinFromFirestore() {
         db.collection("app_config")
-            .document(" 8pIPAtsGEjNRc3w3XS61 ")
+            .document("8pIPAtsGEjNRc3w3XS61")
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
@@ -65,7 +66,7 @@ class PinActivity : AppCompatActivity() {
                     val l = document.getString("l") ?: "0"
                     val i = document.getString("i") ?: "0"
 
-                  
+                    // Build PIN: 1st digit of p + 2nd of u + 3rd of l + 4th of i
                     val constructedPin = buildString {
                         append(if (p.length >= 1) p[0] else '0')
                         append(if (u.length >= 2) u[1] else '0')
