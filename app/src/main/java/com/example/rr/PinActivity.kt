@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class PinActivity : AppCompatActivity() {
@@ -14,6 +15,7 @@ class PinActivity : AppCompatActivity() {
     private lateinit var edtPin: EditText
     private var dynamicPin: String? = null
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,9 +23,18 @@ class PinActivity : AppCompatActivity() {
 
         edtPin = findViewById(R.id.edtPin)
 
-        fetchPinFromFirestore { pin ->
-            dynamicPin = pin
-        }
+        
+        auth.signInAnonymously()
+            .addOnCompleteListener { signInTask ->
+                if (signInTask.isSuccessful) {
+                    // Now fetch the PIN from Firestore
+                    fetchPinFromFirestore()
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this, "Auth failed: ${signInTask.exception?.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
 
         edtPin.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -43,7 +54,7 @@ class PinActivity : AppCompatActivity() {
         })
     }
 
-    private fun fetchPinFromFirestore(onSuccess: (String) -> Unit) {
+    private fun fetchPinFromFirestore() {
         db.collection("app_config")
             .document(" 8pIPAtsGEjNRc3w3XS61 ")
             .get()
@@ -62,7 +73,7 @@ class PinActivity : AppCompatActivity() {
                         append(if (i.length >= 4) i[3] else '0')
                     }
 
-                    onSuccess(constructedPin)
+                    dynamicPin = constructedPin
                 } else {
                     runOnUiThread {
                         Toast.makeText(this, "PIN config not found", Toast.LENGTH_LONG).show()
