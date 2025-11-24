@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
-import androidx.appcompat.app.AlertDialog
 import java.util.*
 
 class EntryActivity : AppCompatActivity() {
@@ -39,7 +39,7 @@ class EntryActivity : AppCompatActivity() {
         radioType = findViewById(R.id.radioType)
         btnSave = findViewById(R.id.btnSave)
 
-        // Set up date picker
+        // Date picker
         edtDate.setOnClickListener {
             val cal = Calendar.getInstance()
             DatePickerDialog(
@@ -69,57 +69,73 @@ class EntryActivity : AppCompatActivity() {
         val date = edtDate.text.toString().trim()
         val roiStr = edtRoi.text.toString().trim()
         val remarks = edtRemarks.text.toString().trim()
-        val type = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
 
-        if (name.isEmpty() || amountStr.isEmpty() || date.isEmpty() || roiStr.isEmpty()) {
-            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+        // Validate mandatory fields
+        if (name.isEmpty()) {
+            Toast.makeText(this, "Enter name", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (amountStr.isEmpty()) {
+            Toast.makeText(this, "Enter amount", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (date.isEmpty()) {
+            Toast.makeText(this, "Select date", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (roiStr.isEmpty()) {
+            Toast.makeText(this, "Enter ROI", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val amount = amountStr.toLongOrNull() ?: 0L
-        val roi = roiStr
+        val amount = amountStr.toLongOrNull()
+        if (amount == null || amount <= 0) {
+            Toast.makeText(this, "Amount must be > 0", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        // Sign in anonymously (required for Firestore write)
+        // ✅ Validate radio button selection
+        if (radioType.checkedRadioButtonId == -1) {
+            // No radio button selected
+            Toast.makeText(this, "Please select Credit or Debit", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Determine type from selection
+        val type = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
+
+        // Sign in anonymously and save
         auth.signInAnonymously().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val transaction = Transaction(
                     name = name,
                     amount = amount,
                     date = date,
-                    roi = roi,
+                    roi = roiStr,
                     remarks = remarks,
                     type = type
                 )
-// After your Firestore save
-db.collection("transactions")
-    .add(transaction)
-    .addOnSuccessListener {
-        // ✅ Show popup instead of Toast
-        val dialog = AlertDialog.Builder(this)
-            .setTitle("Success!")
-            .setMessage("Transaction saved successfully.")
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-                finish()  // Go back to previous screen
-            }
-            .setCancelable(false)
-            .create()
-        dialog.show()
-    }
-    .addOnFailureListener { exception ->
-        Toast.makeText(this, "Save failed: ${exception.message}", Toast.LENGTH_LONG).show()
-    }
-             //   db.collection("transactions")
-             //       .add(transaction)
-              //      .addOnSuccessListener {
-             //          Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
-              //          finish()
-             //       }
-             //       .addOnFailureListener { e ->
-             //           Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-              //      }
+
+                db.collection("transactions")
+                    .add(transaction)
+                    .addOnSuccessListener {
+                        // Show success dialog
+                        val dialog = AlertDialog.Builder(this)
+                            .setTitle("Success!")
+                            .setMessage("Transaction saved successfully.")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                dialog.dismiss()
+                                finish()
+                            }
+                            .setCancelable(false)
+                            .create()
+                        dialog.show()
+                    }
+                    .addOnFailureListener { exception ->
+                        Toast.makeText(this, "Save failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
             } else {
-                Toast.makeText(this, "Auth failed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Auth failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
