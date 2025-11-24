@@ -73,7 +73,7 @@
                 android:id="@+id/edtRoi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="ROI (₹ per ₹100 per month)"
+                android:hint="ROI"
                 android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -104,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:text="Credit"
                 android:textColor="#34A853"
-                android:checked="true" />
+                />
             <RadioButton
                 android:id="@+id/radioDebit"
                 android:layout_width="wrap_content"
