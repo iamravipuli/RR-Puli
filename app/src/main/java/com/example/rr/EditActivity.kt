@@ -107,7 +107,7 @@ class EditActivity : AppCompatActivity() {
         txtRoi.text = item.iRate
         edtRemarks.setText(item.remarks)
 
-        // ✅ Set radio button based on original type
+        // Set radio button based on current type
         when (item.type) {
             "credit" -> {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
@@ -145,7 +145,7 @@ class EditActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ Determine new type from radio selection
+        // ✅ Determine new type from radio selection (not from 'type' variable)
         val newType = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
 
         // Sign in anonymously (required for Firestore write)
@@ -156,19 +156,20 @@ class EditActivity : AppCompatActivity() {
                     "amount" to amount,
                     "date" to date,
                     "remarks" to remarks,
-                    "type" to newType  // ✅ Allow type to be updated
+                    "type" to newType  // ✅ Update type based on radio selection
                 )
 
-                db.collection("app_config")  // ← Correct collection name
+                db.collection("app_config")  // ← Ensure this matches your Firestore structure
                     .document(documentId)
                     .update(updateMap)
                     .addOnSuccessListener {
+                        // Show success dialog
                         val dialog = AlertDialog.Builder(this)
                             .setTitle("Success!")
                             .setMessage("Transaction updated successfully.")
                             .setPositiveButton("OK") { dialog, _ ->
                                 dialog.dismiss()
-                                finish()
+                                finish()  // Return to detail screen
                             }
                             .setCancelable(false)
                             .create()
