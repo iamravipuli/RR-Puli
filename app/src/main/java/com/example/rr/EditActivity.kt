@@ -3,7 +3,6 @@ package com.example.rrpuli
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.Button
-import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -21,7 +20,6 @@ class EditActivity : AppCompatActivity() {
     private lateinit var edtDate: TextInputEditText
     private lateinit var txtRoi: TextView
     private lateinit var edtRemarks: TextInputEditText
-    private lateinit var radioType: RadioGroup
     private lateinit var btnSave: Button
     private lateinit var btnCancel: Button
 
@@ -41,7 +39,6 @@ class EditActivity : AppCompatActivity() {
         edtDate = findViewById(R.id.edtDate)
         txtRoi = findViewById(R.id.txtRoi)
         edtRemarks = findViewById(R.id.edtRemarks)
-        radioType = findViewById(R.id.radioType)
         btnSave = findViewById(R.id.btnSave)
         btnCancel = findViewById(R.id.btnCancel)
 
@@ -106,26 +103,6 @@ class EditActivity : AppCompatActivity() {
         edtDate.setText(item.date)
         txtRoi.text = item.iRate
         edtRemarks.setText(item.remarks)
-
-        // ✅ Safe access to item.type (no naming conflicts)
-     /*   when (item.type) {
-            "credit" -> {
-                findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
-            }
-            "debit" -> {
-                findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
-            }
-        }*/
-
-        val originalType = item.type
-when (originalType) {
-    "credit" -> {
-        findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
-    }
-    "debit" -> {
-        findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
-    }
-}
     }
 
     private fun updateTransaction() {
@@ -149,27 +126,21 @@ when (originalType) {
             return
         }
 
-        // Validate radio button selection
-        if (radioType.checkedRadioButtonId == -1) {
-            Toast.makeText(this, "Select Credit or Debit", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // ✅ Determine new transaction type from radio selection (no naming conflicts)
-        val newTransactionType = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
-
         // Sign in anonymously (required for Firestore write)
         auth.signInAnonymously().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Update in transactions collection
+                // Update only editable fields (amount, date, remarks)
+                // ✅ Do NOT update type (keep original type)
+                val updateMap = mapOf(
+                    "amount", amount,
+                    "date", date,
+                    "remarks", remarks
+                    // Note: No "type" field updated
+                )
+
                 db.collection("transactions")
                     .document(documentId)
-                    .update(
-                        "amount", amount,
-                        "date", date,
-                        "remarks", remarks,
-                        "type", newTransactionType  // ✅ Use renamed variable
-                    )
+                    .update(updateMap)
                     .addOnSuccessListener {
                         // Show success dialog
                         val dialog = AlertDialog.Builder(this)
@@ -177,7 +148,7 @@ when (originalType) {
                             .setMessage("Transaction updated successfully.")
                             .setPositiveButton("OK") { dialog, _ ->
                                 dialog.dismiss()
-                                finish()
+                                finish()  // Return to detail screen
                             }
                             .setCancelable(false)
                             .create()
