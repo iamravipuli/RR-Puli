@@ -107,15 +107,15 @@ class EditActivity : AppCompatActivity() {
         txtRoi.text = item.iRate
         edtRemarks.setText(item.remarks)
 
-        // Set radio button based on original type
-     /*   when (item.type) {
+        // ✅ Safe access to item.type (no naming conflicts)
+        when (item.type) {
             "credit" -> {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
             }
             "debit" -> {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
             }
-        }*/
+        }
     }
 
     private fun updateTransaction() {
@@ -145,8 +145,8 @@ class EditActivity : AppCompatActivity() {
             return
         }
 
-        // Determine new type from radio selection
-        val newType = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
+        // ✅ Determine new transaction type from radio selection (no naming conflicts)
+        val newTransactionType = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
 
         // Sign in anonymously (required for Firestore write)
         auth.signInAnonymously().addOnCompleteListener { task ->
@@ -158,7 +158,7 @@ class EditActivity : AppCompatActivity() {
                         "amount", amount,
                         "date", date,
                         "remarks", remarks,
-                        "type", newType  // ✅ Use newType instead of 'type'
+                        "type", newTransactionType  // ✅ Use renamed variable
                     )
                     .addOnSuccessListener {
                         // Show success dialog
