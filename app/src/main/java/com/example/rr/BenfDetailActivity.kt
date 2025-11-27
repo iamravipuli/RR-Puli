@@ -60,6 +60,13 @@ class BenfDetailActivity : AppCompatActivity() {
             setTextColor(0xFF34A853.toInt()) // Green header
         }
 
+         findViewById<Button>(R.id.btnEdit).setOnClickListener {
+            val intent = Intent(this, EditActivity::class.java).apply {
+                putExtra("item", item)
+            }
+            startActivity(intent)
+        }
+
         // Calculate interest & duration
         val (interestValue, durationText) = calculateInterestAndDuration(item, today)
 
