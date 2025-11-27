@@ -105,61 +105,59 @@ class EditActivity : AppCompatActivity() {
         edtRemarks.setText(item.remarks)
     }
 
-    private fun updateTransaction() {
-        val amountStr = edtAmount.text.toString().trim()
-        val date = edtDate.text.toString().trim()
-        val remarks = edtRemarks.text.toString().trim()
+   private fun updateTransaction() {
+    val amountStr = edtAmount.text.toString().trim()
+    val date = edtDate.text.toString().trim()
+    val remarks = edtRemarks.text.toString().trim()
 
-        // Validate modifiable fields
-        if (amountStr.isEmpty()) {
-            Toast.makeText(this, "Enter amount", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (date.isEmpty()) {
-            Toast.makeText(this, "Select date", Toast.LENGTH_SHORT).show()
-            return
-        }
+    // Validate modifiable fields
+    if (amountStr.isEmpty()) {
+        Toast.makeText(this, "Enter amount", Toast.LENGTH_SHORT).show()
+        return
+    }
+    if (date.isEmpty()) {
+        Toast.makeText(this, "Select date", Toast.LENGTH_SHORT).show()
+        return
+    }
 
-        val amount = amountStr.toLongOrNull()
-        if (amount == null || amount <= 0) {
-            Toast.makeText(this, "Amount must be > 0", Toast.LENGTH_SHORT).show()
-            return
-        }
+    val amount = amountStr.toLongOrNull()
+    if (amount == null || amount <= 0) {
+        Toast.makeText(this, "Amount must be > 0", Toast.LENGTH_SHORT).show()
+        return
+    }
 
-        // Sign in anonymously (required for Firestore write)
-        auth.signInAnonymously().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // Update only editable fields (amount, date, remarks)
-                // ✅ Do NOT update type (keep original type)
-                val updateMap = mapOf(
-                    "amount", amount,
-                    "date", date,
-                    "remarks", remarks
-                    // Note: No "type" field updated
-                )
+    // Sign in anonymously (required for Firestore write)
+    auth.signInAnonymously().addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            // ✅ Correct Firestore update syntax: use mapOf with "key" to value
+            val updateMap = mapOf(
+                "amount" to amount,
+                "date" to date,
+                "remarks" to remarks
+            )
 
-                db.collection("transactions")
-                    .document(documentId)
-                    .update(updateMap)
-                    .addOnSuccessListener {
-                        // Show success dialog
-                        val dialog = AlertDialog.Builder(this)
-                            .setTitle("Success!")
-                            .setMessage("Transaction updated successfully.")
-                            .setPositiveButton("OK") { dialog, _ ->
-                                dialog.dismiss()
-                                finish()  // Return to detail screen
-                            }
-                            .setCancelable(false)
-                            .create()
-                        dialog.show()
-                    }
-                    .addOnFailureListener { exception ->
-                        Toast.makeText(this, "Update failed: ${exception.message}", Toast.LENGTH_LONG).show()
-                    }
-            } else {
-                Toast.makeText(this, "Auth failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-            }
+            db.collection("transactions")
+                .document(documentId)
+                .update(updateMap)
+                .addOnSuccessListener {
+                    // Show success dialog
+                    val dialog = AlertDialog.Builder(this)
+                        .setTitle("Success!")
+                        .setMessage("Transaction updated successfully.")
+                        .setPositiveButton("OK") { dialog, _ ->
+                            dialog.dismiss()
+                            finish()
+                        }
+                        .setCancelable(false)
+                        .create()
+                    dialog.show()
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(this, "Update failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                }
+        } else {
+            Toast.makeText(this, "Auth failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
         }
     }
+}
 }
