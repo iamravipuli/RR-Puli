@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Non-editable fields -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,7 +41,7 @@
             android:layout_marginBottom="16dp"
             android:gravity="center_vertical" />
 
-        <!-- Amount -->
+        <!-- Amount (Editable) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -56,7 +57,7 @@
                 android:maxLength="7" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Date -->
+        <!-- Date (Editable) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -93,7 +94,7 @@
             android:layout_marginBottom="16dp"
             android:gravity="center_vertical" />
 
-        <!-- Remarks -->
+        <!-- Remarks (Editable) -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -109,41 +110,6 @@
                 android:lines="3"
                 android:maxLines="5" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Transaction Type (Editable) -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Transaction Type"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#202124"
-            android:layout_marginBottom="12dp" />
-
-        <RadioGroup
-            android:id="@+id/radioType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="24dp">
-
-            <RadioButton
-                android:id="@+id/radioCredit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Credit"
-                android:textColor="#34A853"
-                android:layout_marginEnd="24dp" />
-
-            <RadioButton
-                android:id="@+id/radioDebit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Debit"
-                android:textColor="#EA4335" />
-
-        </RadioGroup>
 
         <!-- Buttons -->
         <LinearLayout
