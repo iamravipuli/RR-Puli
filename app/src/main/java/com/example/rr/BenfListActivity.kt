@@ -37,58 +37,63 @@ class BenfListActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
-        if (auth.currentUser == null) {
-            auth.signInAnonymously()
-                .addOnCompleteListener { signInTask ->
-                    if (signInTask.isSuccessful) {
-                        performFirestoreQuery(type, onSuccess)
-                    } else {
-                        runOnUiThread {
-                            Toast.makeText(this, "Auth failed: ${signInTask.exception?.message}", Toast.LENGTH_LONG).show()
-                        }
+ private fun fetchTransactions(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
+    if (auth.currentUser == null) {
+        auth.signInAnonymously()
+            .addOnCompleteListener { signInTask ->
+                if (signInTask.isSuccessful) {
+                    performFirestoreQuery(type, onSuccess)
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this, "Auth failed: ${signInTask.exception?.message}", Toast.LENGTH_LONG).show()
                     }
-                }
-        } else {
-            performFirestoreQuery(type, onSuccess)
-        }
-    }
-
-    private fun performFirestoreQuery(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
-        Thread {
-            try {
-                db.collection("transactions")
-                    .whereEqualTo("type", type.lowercase())
-                    .get()
-                    .addOnSuccessListener { result ->
-                        val list = mutableListOf<BenfDetails>()
-                        for (document in result) {
-                            val item = BenfDetails(
-                                id = document.id,
-                                name = document.getString("name") ?: "",
-                                amount = document.getLong("amount") ?: 0,
-                                date = document.getString("date") ?: "",
-                                iRate = document.getString("roi") ?: "0.00",
-                                remarks = document.getString("remarks") ?: ""
-                            )
-                            list.add(item)
-                        }
-
-                        runOnUiThread {
-                            onSuccess(list)
-                        }
-                    }
-                    .addOnFailureListener { exception ->
-                        runOnUiThread {
-                            // Simple, safe error message
-                            Toast.makeText(this, "Load failed: ${exception.message}", Toast.LENGTH_LONG).show()
-                        }
-                    }
-            } catch (e: Exception) {
-                runOnUiThread {
-                    Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
-        }.start()
+    } else {
+        performFirestoreQuery(type, onSuccess)
     }
+}
+
+// ✅ Updated helper method with sorting
+private fun performFirestoreQuery(type: String, onSuccess: (List<BenfDetails>) -> Unit) {
+    Thread {
+        try {
+            db.collection("transactions")
+                .whereEqualTo("type", type.lowercase())
+                .get()
+                .addOnSuccessListener { result ->
+                    val list = mutableListOf<BenfDetails>()
+                    for (document in result) {
+                        val item = BenfDetails(
+                            id = document.id,
+                            name = document.getString("name") ?: "",
+                            amount = document.getLong("amount") ?: 0,
+                            date = document.getString("date") ?: "",
+                            iRate = document.getString("roi") ?: "0.00",
+                            remarks = document.getString("remarks") ?: ""
+                        )
+                        list.add(item)
+                    }
+
+                    // ✅ Sort alphabetically by name (case-insensitive)
+                    val sortedList = list.sortedBy { it.name.lowercase() }
+
+                    runOnUiThread {
+                        onSuccess(sortedList)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    runOnUiThread {
+                        Toast.makeText(this@BenfListActivity, "Load failed: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+        } catch (e: Exception) {
+            runOnUiThread {
+                Toast.makeText(this@BenfListActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }.start()
+}
+
+ 
 }
