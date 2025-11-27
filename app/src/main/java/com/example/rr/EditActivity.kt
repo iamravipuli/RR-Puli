@@ -3,7 +3,6 @@ package com.example.rrpuli
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.Button
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
@@ -108,18 +107,13 @@ class EditActivity : AppCompatActivity() {
         txtRoi.text = item.iRate
         edtRemarks.setText(item.remarks)
 
-        // Set radio button based on current type
-        val creditRadio = findViewById<RadioButton>(R.id.radioCredit)
-        val debitRadio = findViewById<RadioButton>(R.id.radioDebit)
-
+        // ✅ Set radio button based on original type
         when (item.type) {
             "credit" -> {
-                creditRadio.isChecked = true
-                debitRadio.isChecked = false
+                findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
             }
             "debit" -> {
-                creditRadio.isChecked = false
-                debitRadio.isChecked = true
+                findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
             }
         }
     }
@@ -129,7 +123,7 @@ class EditActivity : AppCompatActivity() {
         val date = edtDate.text.toString().trim()
         val remarks = edtRemarks.text.toString().trim()
 
-        // Validate modifiable fields only
+        // Validate modifiable fields
         if (amountStr.isEmpty()) {
             Toast.makeText(this, "Enter amount", Toast.LENGTH_SHORT).show()
             return
@@ -151,29 +145,30 @@ class EditActivity : AppCompatActivity() {
             return
         }
 
-        val type = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
+        // ✅ Determine new type from radio selection
+        val newType = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
 
         // Sign in anonymously (required for Firestore write)
         auth.signInAnonymously().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Update only modifiable fields
-                val updateMap = mutableMapOf<String, Any>()
-                updateMap["amount"] = amount
-                updateMap["date"] = date
-                updateMap["remarks"] = remarks
-                updateMap["type"] = type
+                // Update only the fields the user can modify
+                val updateMap = mapOf(
+                    "amount" to amount,
+                    "date" to date,
+                    "remarks" to remarks,
+                    "type" to newType  // ✅ Allow type to be updated
+                )
 
-                db.collection("transactions")
+                db.collection("app_config")  // ← Correct collection name
                     .document(documentId)
                     .update(updateMap)
                     .addOnSuccessListener {
-                        // Show success dialog
                         val dialog = AlertDialog.Builder(this)
                             .setTitle("Success!")
                             .setMessage("Transaction updated successfully.")
                             .setPositiveButton("OK") { dialog, _ ->
                                 dialog.dismiss()
-                                finish()  // Return to detail screen
+                                finish()
                             }
                             .setCancelable(false)
                             .create()
