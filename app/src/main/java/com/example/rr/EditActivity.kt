@@ -107,7 +107,7 @@ class EditActivity : AppCompatActivity() {
         txtRoi.text = item.iRate
         edtRemarks.setText(item.remarks)
 
-        // Set radio button based on current type
+        // Set radio button based on original type
         when (item.type) {
             "credit" -> {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
@@ -145,23 +145,21 @@ class EditActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ Determine new type from radio selection (not from 'type' variable)
+        // Determine new type from radio selection
         val newType = if (radioType.checkedRadioButtonId == R.id.radioCredit) "credit" else "debit"
 
         // Sign in anonymously (required for Firestore write)
         auth.signInAnonymously().addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Update only the fields the user can modify
-                val updateMap = mapOf(
-                    "amount" to amount,
-                    "date" to date,
-                    "remarks" to remarks,
-                    "type" to newType  // ✅ Update type based on radio selection
-                )
-
-                db.collection("app_config")  // ← Ensure this matches your Firestore structure
+                // Update in transactions collection
+                db.collection("transactions")
                     .document(documentId)
-                    .update(updateMap)
+                    .update(
+                        "amount", amount,
+                        "date", date,
+                        "remarks", remarks,
+                        "type", newType  // ✅ Use newType instead of 'type'
+                    )
                     .addOnSuccessListener {
                         // Show success dialog
                         val dialog = AlertDialog.Builder(this)
@@ -169,7 +167,7 @@ class EditActivity : AppCompatActivity() {
                             .setMessage("Transaction updated successfully.")
                             .setPositiveButton("OK") { dialog, _ ->
                                 dialog.dismiss()
-                                finish()  // Return to detail screen
+                                finish()
                             }
                             .setCancelable(false)
                             .create()
