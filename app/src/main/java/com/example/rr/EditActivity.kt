@@ -116,6 +116,16 @@ class EditActivity : AppCompatActivity() {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
             }
         }*/
+
+        val originalType = item.type
+when (originalType) {
+    "credit" -> {
+        findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
+    }
+    "debit" -> {
+        findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
+    }
+}
     }
 
     private fun updateTransaction() {
