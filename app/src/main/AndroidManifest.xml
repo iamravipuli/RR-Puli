@@ -24,6 +24,7 @@
 <activity android:name=".EntryActivity" />
         <activity android:name=".BenfDetailActivity" />
          <activity android:name=".BenfListActivity" />
+         <activity android:name=".EditActivity" />  
     </application>
 
 </manifest>
