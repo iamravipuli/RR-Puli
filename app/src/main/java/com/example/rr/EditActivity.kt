@@ -108,14 +108,14 @@ class EditActivity : AppCompatActivity() {
         edtRemarks.setText(item.remarks)
 
         // ✅ Safe access to item.type (no naming conflicts)
-        when (item.type) {
+     /*   when (item.type) {
             "credit" -> {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioCredit)
             }
             "debit" -> {
                 findViewById<RadioGroup>(R.id.radioType).check(R.id.radioDebit)
             }
-        }
+        }*/
     }
 
     private fun updateTransaction() {
