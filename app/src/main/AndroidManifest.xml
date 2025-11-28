@@ -6,7 +6,8 @@
     <application
         android:name=".RRApplication"
         android:allowBackup="true"
-        android:icon="@android:drawable/ic_menu_agenda"
+      
+         android:icon="@mipmap/ic_launcher" 
         android:label="RR Puli"
         android:theme="@style/Theme.Material3.Light.NoActionBar">
      
