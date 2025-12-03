@@ -11,6 +11,16 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                1001  // Request code
+            )
+        }
+    }
+        
         // Credit Reports → passes "credit" type
         findViewById<View>(R.id.tileCredit).setOnClickListener {
             startActivity(Intent(this, BenfListActivity::class.java).putExtra("type", "credit"))
