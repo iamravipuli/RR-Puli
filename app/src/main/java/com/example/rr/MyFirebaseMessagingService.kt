@@ -50,9 +50,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        // ✅ Fixed: Use the correct notification builder
         val notification = NotificationCompat.Builder(this, "rr_puli_channel")
-            .setSmallIcon(R.drawable.ic_notification)  // Create this icon
-            .setContentTitle(title)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)  // ✅ Use system icon temporarily
+            .setContentTitle(title)                            // ✅ Correct method call
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
