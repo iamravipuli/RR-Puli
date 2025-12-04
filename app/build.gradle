@@ -40,7 +40,7 @@ android {
 dependencies {
        // ✅ Updated Firebase BoM (matches your docs)
     implementation platform('com.google.firebase:firebase-bom:34.4.0')
-    implementation 'com.google.firebase:firebase-messaging:24.0.1'
+    implementation 'com.google.firebase:firebase-messaging:25.0.1'
     // Firebase services (no versions needed with BoM)
     implementation 'com.google.firebase:firebase-auth'        // Uses 22.3.1 from BoM
     implementation 'com.google.firebase:firebase-firestore'   // Uses latest from BoM
