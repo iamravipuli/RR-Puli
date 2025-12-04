@@ -10,7 +10,13 @@
          android:icon="@mipmap/ic_launcher" 
         android:label="RR Puli"
         android:theme="@style/Theme.Material3.Light.NoActionBar">
-     
+     <service
+    android:name=".MyFirebaseMessagingService"
+    android:exported="false">
+    <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT" />
+    </intent-filter>
+</service>
       <activity
     android:name=".PinActivity"
     android:exported="true">
